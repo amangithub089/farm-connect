@@ -1,7 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { ShoppingCart, LogOut, ListOrdered } from "lucide-react";
-import logo from "../assets/logo.svg"; // Ensure this path is correct
+import logo from "../assets/logo.svg"; 
 
 const Navbar = () => {
   const { user, logoutUser } = useAuth();

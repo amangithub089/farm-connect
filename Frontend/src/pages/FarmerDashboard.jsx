@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
-import { FaPlusCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance"; 
 
 const FarmerDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
   const [products, setProducts] = useState([]);
 
   const initialForm = {
@@ -20,7 +18,7 @@ const FarmerDashboard = () => {
     location: "",
     image: null,
   };
-  
+
   const [form, setForm] = useState(initialForm);
   const [isEditing, setIsEditing] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
@@ -28,12 +26,11 @@ const FarmerDashboard = () => {
 
   const fetchMyProducts = async () => {
     try {
-      const { data } = await axios.get("/api/products/my", {
-        withCredentials: true,
-      });
+      const { data } = await axiosInstance.get("/api/products/my");
       setProducts(data);
-    } catch {
+    } catch (err) {
       toast.error("Failed to load your products");
+      console.error("Fetch products error:", err);
     }
   };
 
@@ -64,14 +61,12 @@ const FarmerDashboard = () => {
 
     try {
       if (isEditing) {
-        await axios.put(`/api/products/${editProductId}`, data, {
-          withCredentials: true,
+        await axiosInstance.put(`/api/products/${editProductId}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success("Product updated!");
       } else {
-        await axios.post("/api/products", data, {
-          withCredentials: true,
+        await axiosInstance.post("/api/products", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success("Product added!");
@@ -81,16 +76,18 @@ const FarmerDashboard = () => {
       fetchMyProducts();
     } catch (err) {
       toast.error(err.response?.data?.message || "Error saving product");
+      console.error("Submit error:", err);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/products/${id}`, { withCredentials: true });
+      await axiosInstance.delete(`/api/products/${id}`);
       toast.success("Product removed");
       fetchMyProducts();
-    } catch {
+    } catch (err) {
       toast.error("Failed to delete");
+      console.error("Delete error:", err);
     }
   };
 
@@ -100,7 +97,6 @@ const FarmerDashboard = () => {
         Welcome, {user.name}
       </h1>
 
-      {/* ────── ACTION BUTTONS ────── */}
       <div className="flex justify-center gap-4 mb-10">
         <button
           onClick={() => {
@@ -119,7 +115,6 @@ const FarmerDashboard = () => {
         </button>
       </div>
 
-      {/* ────── PRODUCT LIST ────── */}
       <h2 className="text-2xl font-semibold mb-6 text-green-800 text-center">
         Your Products
       </h2>
@@ -175,7 +170,6 @@ const FarmerDashboard = () => {
         ))}
       </div>
 
-      {/* ────── MODAL FORM ────── */}
       {showFormModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-lg relative">

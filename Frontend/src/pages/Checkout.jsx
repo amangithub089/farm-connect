@@ -1,15 +1,14 @@
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
 
 const Checkout = () => {
   const { cart, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-
   const [address, setAddress] = useState(user?.address || "");
 
   const totalAmount = cart.reduce(
@@ -18,27 +17,31 @@ const Checkout = () => {
   );
 
   const handleOrder = async () => {
-    if (!address) return toast.error("Delivery address is required");
-    if (cart.length === 0) return toast.error("Cart is empty");
+    if (!address) {
+      toast.error("Delivery address is required");
+      return;
+    }
+
+    if (cart.length === 0) {
+      toast.error("Cart is empty");
+      return;
+    }
 
     try {
-      await axios.post(
-        "/api/orders/",
-        {
-          products: cart.map((item) => ({
-            product: item._id,
-            quantity: item.quantity,
-          })),
-          totalAmount,
-          deliveryAddress: address,
-        },
-        { withCredentials: true }
-      );
+      await axiosInstance.post("/api/orders", {
+        products: cart.map((item) => ({
+          product: item._id,
+          quantity: item.quantity,
+        })),
+        totalAmount,
+        deliveryAddress: address,
+      });
 
       toast.success("Order placed successfully!");
       clearCart();
       navigate("/thank-you");
     } catch (error) {
+      console.error("Failed to place order:", error);
       toast.error("Failed to place order");
     }
   };
@@ -67,7 +70,7 @@ const Checkout = () => {
                 <p className="text-xs text-gray-500">Seller: {item.farmer?.name}</p>
               </div>
               <p className="text-green-700 font-semibold">
-                ₹{(item.pricePerUnit * item.quantity).toFixed(2)}
+                ₹ {(item.pricePerUnit * item.quantity).toFixed(2)}
               </p>
             </div>
           </div>

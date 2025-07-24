@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance from "../utils/axiosInstance"; 
 
 const Register = () => {
   const navigate = useNavigate();
@@ -26,10 +26,7 @@ const Register = () => {
     }
 
     try {
-      const res = await axios.post("/api/auth/register", form, {
-        withCredentials: true
-      });
-
+      await axiosInstance.post("/api/auth/register", form); 
       toast.success("Registration successful!");
       navigate("/login");
     } catch (error) {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import axiosInstance from "../utils/axiosInstance"; 
 
 const FarmerOrders = () => {
   const { user } = useAuth();
@@ -10,9 +10,7 @@ const FarmerOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await axios.get("/api/orders/farmer", {
-        withCredentials: true,
-      });
+      const { data } = await axiosInstance.get("/api/orders/farmer");
       setOrders(data);
     } catch {
       toast.error("Failed to load your orders");
@@ -21,11 +19,9 @@ const FarmerOrders = () => {
 
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
-      await axios.put(
-        `/api/orders/status/${orderId}`,
-        { status: newStatus },
-        { withCredentials: true }
-      );
+      await axiosInstance.put(`/api/orders/status/${orderId}`, {
+        status: newStatus,
+      });
       toast.success(`Status updated to "${newStatus}"`);
       fetchOrders();
     } catch (err) {
@@ -44,7 +40,9 @@ const FarmerOrders = () => {
       </h1>
 
       {orders.length === 0 ? (
-        <p className="text-center text-gray-600 text-lg">No orders received yet.</p>
+        <p className="text-center text-gray-600 text-lg">
+          No orders received yet.
+        </p>
       ) : (
         <div className="space-y-6 max-w-5xl mx-auto">
           {orders.map((order) => (
@@ -65,12 +63,15 @@ const FarmerOrders = () => {
                     ({order.buyer?.email})
                   </p>
                   <p className="text-xs text-gray-500">
-                    Ordered on: {new Date(order.createdAt).toLocaleDateString("en-GB")}
+                    Ordered on:{" "}
+                    {new Date(order.createdAt).toLocaleDateString("en-GB")}
                   </p>
                 </div>
                 <div className="text-sm font-medium text-green-800">
                   Status:{" "}
-                  <span className="capitalize text-gray-700">{order.status}</span>
+                  <span className="capitalize text-gray-700">
+                    {order.status}
+                  </span>
                 </div>
               </div>
 
@@ -121,7 +122,9 @@ const FarmerOrders = () => {
                 )}
                 {order.status === "Accepted" && (
                   <button
-                    onClick={() => handleStatusUpdate(order._id, "Delivered")}
+                    onClick={() =>
+                      handleStatusUpdate(order._id, "Delivered")
+                    }
                     className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm"
                   >
                     Mark Delivered
@@ -137,14 +140,27 @@ const FarmerOrders = () => {
       {selectedBuyer && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
-            <h2 className="text-xl font-bold mb-4 text-green-800">Buyer Details</h2>
-            <p><span className="font-semibold">Name:</span> {selectedBuyer.name}</p>
-            <p><span className="font-semibold">Email:</span> {selectedBuyer.email}</p>
+            <h2 className="text-xl font-bold mb-4 text-green-800">
+              Buyer Details
+            </h2>
+            <p>
+              <span className="font-semibold">Name:</span> {selectedBuyer.name}
+            </p>
+            <p>
+              <span className="font-semibold">Email:</span>{" "}
+              {selectedBuyer.email}
+            </p>
             {selectedBuyer.phone && (
-              <p><span className="font-semibold">Phone:</span> {selectedBuyer.phone}</p>
+              <p>
+                <span className="font-semibold">Phone:</span>{" "}
+                {selectedBuyer.phone}
+              </p>
             )}
             {selectedBuyer.address && (
-              <p><span className="font-semibold">Address:</span> {selectedBuyer.address}</p>
+              <p>
+                <span className="font-semibold">Address:</span>{" "}
+                {selectedBuyer.address}
+              </p>
             )}
 
             <div className="mt-6 text-right">

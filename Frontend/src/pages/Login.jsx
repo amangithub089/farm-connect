@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import axiosInstance from "../utils/axiosInstance"; // 
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ const Login = () => {
 
   const [form, setForm] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -25,10 +25,7 @@ const Login = () => {
     }
 
     try {
-      const res = await axios.post("/api/auth/login", form, {
-        withCredentials: true,
-      });
-
+      const res = await axiosInstance.post("/api/auth/login", form); // ✅ consistent base URL
       toast.success("Login successful!");
       loginUser(res.data);
 

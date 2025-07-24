@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import axiosInstance from "../utils/axiosInstance"; 
 
 const Products = () => {
   const { user } = useAuth();
@@ -14,7 +14,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("/api/products");
+        const res = await axiosInstance.get("/api/products"); 
         setProducts(res.data);
       } catch (error) {
         toast.error("Failed to load products");
@@ -95,7 +95,6 @@ const Products = () => {
             <p><span className="font-medium">Email:</span> {selectedFarmer.email}</p>
             <p><span className="font-medium">Phone:</span> {selectedFarmer.phone}</p>
             <p><span className="font-medium">Address:</span> {selectedFarmer.address}</p>
-            {/* Add more fields as needed */}
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // centralized instance
 
 const AuthContext = createContext();
 
@@ -7,17 +7,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
   const loginUser = (userData) => setUser(userData);
 
   const logoutUser = async () => {
     try {
-      await axios.post(
-        `${API_BASE_URL}/auth/logout`,
-        {},
-        { withCredentials: true }
-      );
+      await axiosInstance.post("api/auth/logout"); // no baseURL or withCredentials needed
     } catch (err) {
       console.error("Logout error:", err);
     }
@@ -26,9 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const loadUser = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/auth/profile`, {
-        withCredentials: true,
-      });
+      const res = await axiosInstance.get("api/auth/profile"); // uses central config
       setUser(res.data);
     } catch (error) {
       if (error.response?.status === 401) {
