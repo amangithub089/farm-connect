@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const logoutUser = async () => {
     try {
       await axios.post(
-        `${API_BASE_URL}/api/auth/logout`,
+        `${API_BASE_URL}/auth/logout`,
         {},
         { withCredentials: true }
       );
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
 
   const loadUser = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/auth/profile`, {
+      const res = await axios.get(`${API_BASE_URL}/auth/profile`, {
         withCredentials: true,
       });
       setUser(res.data);
